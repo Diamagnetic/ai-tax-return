@@ -7,7 +7,7 @@ router = APIRouter()
 async def home():
   return { "message" : "AI Tax Return Agent backend is running" }
 
-# Upload files, extract data, calculate taxes, 
+# Upload files, extract data, calculate taxes, and return Form 1040
 @router.post("/extract-and-calculate")
 async def extract_and_calculate(files : List[UploadFile] = File(...)):
   results = []
