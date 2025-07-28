@@ -42,3 +42,8 @@ class TaxReturnSummary(BaseModel):
   total_tax_withheld: Decimal = Field(ge = 0)
   estimated_tax_due: Decimal = Field(ge = 0)
   estimated_refund: Decimal = Field(ge = 0)
+
+class TaxBracket(BaseModel):
+  lower_limit: Decimal = Field(ge = 0)
+  upper_limit: Decimal | None = Field(default = None)
+  rate: Decimal = Field(ge = 0, le = 1)
