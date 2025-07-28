@@ -1,3 +1,17 @@
+from pathlib import Path
+from typing import List
+import os
+import sys
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+TAX_POLICY_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "tax_policy"))
+
+if TAX_POLICY_DIR not in sys.path:
+    sys.path.insert(0, TAX_POLICY_DIR)
+
+from tax_calculator import TaxFormData
+from tax_policy_config import SingleFiler2024Config
+
 def generate_filled_1040(
   file_buffers: List[tuple[str, bytes]],
   input_pdf_path: Path,
@@ -12,6 +26,6 @@ def generate_filled_1040(
   # Calculate tax summary
   generator.generate_pdf(
     input_pdf_path = input_pdf_path,
-    data = tax_form_data
+    data = tax_form_data,
     output_pdf_path = output_pdf_path
   )
