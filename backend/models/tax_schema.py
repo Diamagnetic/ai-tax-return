@@ -34,8 +34,8 @@ class INTData(BaseModel):
 
 class TaxFormData(BaseModel):
   w2: W2Data = Field(alias = "w2")
-  _1099_nec: NECData = Field(alias = "1099_nec")
-  _1099_int: INTData = Field(alias = "1099_int")
+  nec_1099: NECData = Field(alias = "1099_nec")
+  int_1099: INTData = Field(alias = "1099_int")
 
 class TaxReturnSummary(BaseModel):
   total_income: Decimal = Field(ge = 0)
