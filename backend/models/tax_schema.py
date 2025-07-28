@@ -33,8 +33,9 @@ class INTData(BaseModel):
   interest_income: Decimal = Field()
 
 class TaxFormData(BaseModel):
-  form_type: Literal["W-2", "1099-NEC", "1099-INT"]
-  data: Union[W2Data, NECData, INTData]
+  w2: W2Data = Field(alias = "w2")
+  _1099_nec: NECData = Field(alias = "1099_nec")
+  _1099_int: INTData = Field(alias = "1099_int")
 
 class TaxReturnSummary(BaseModel):
   total_income: Decimal = Field(ge = 0)
