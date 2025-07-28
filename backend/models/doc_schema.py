@@ -50,3 +50,5 @@ class Form1040(BaseModel):
     alias = "37",
     description = "Amount you owe if tax due exceeds total payments"
   )
+
+  model_config = { "populate_by_name": True }
