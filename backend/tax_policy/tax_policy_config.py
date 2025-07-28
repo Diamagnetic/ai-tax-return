@@ -1,5 +1,15 @@
 from typing import List
 from decimal import Decimal
+import os
+import sys
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODELS_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "models"))
+
+if MODELS_DIR not in sys.path:
+    sys.path.insert(0, MODELS_DIR)
+
+from tax_schema import TaxBracket
 
 class SingleFiler2024Config:
   @staticmethod
