@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import Optional, Union, Literal, Any
+from pydantic import BaseModel, Field, field_validator
+from typing import Any
 from decimal import Decimal
 
 # Decorator to inject a validator
