@@ -16,7 +16,7 @@ if MODELS_DIR not in sys.path:
 
 from tax_schema import TaxFormData
 
-class TextExtractor:
+class FormExtractor:
   SYSTEM_INSTRUCTIONS = """You are a tax form data extraction assistant. 
 
 You will be given documents like W-2, 1099-NEC, or 1099-INT. 
@@ -91,19 +91,3 @@ Your task is to:
     event = response.output_parsed
 
     return event
-
-if __name__ == "__main__":
-  PDF_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "sample_docs", "1"))
-  pdf_paths = [
-    os.path.abspath(os.path.join(PDF_DIR, "w2_1.pdf")),
-    os.path.abspath(os.path.join(PDF_DIR, "nec_1.pdf")),
-    os.path.abspath(os.path.join(PDF_DIR, "int_1.pdf"))
-  ]
-
-  extractor = TextExtractor()
-
-  try:
-    result : TaxFormData = extractor.extract_from_pdfs(pdf_paths)
-    print(result.model_dump())
-  except Exception as e:
-    print("Error during extraction:", str(e))
