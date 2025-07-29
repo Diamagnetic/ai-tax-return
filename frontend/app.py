@@ -22,7 +22,7 @@ if "document_id" not in st.session_state:
   st.session_state.document_id = None
 
 # Server configuration
-SERVER_URL = "http://localhost:8000"
+SERVER_URL = "https://ai-tax-return-backend-92e5b1232028.herokuapp.com"
 UPLOAD_ENDPOINT = f"{SERVER_URL}/upload_documents"
 
 def upload_files_to_server(files: List) -> Optional[str]:
