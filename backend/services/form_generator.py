@@ -15,7 +15,7 @@ if MODELS_DIR not in sys.path:
 if TAX_POLICY_DIR not in sys.path:
     sys.path.insert(0, TAX_POLICY_DIR)
 
-from .tax_calculator import TaxCalculator, TaxReturnSummary, TaxFormData
+from tax_calculator import TaxCalculator, TaxReturnSummary, TaxFormData
 from tax_policy_config import SingleFiler2024Config
 from tax_schema import TaxBracket
 from doc_schema import Form1040
