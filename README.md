@@ -6,6 +6,8 @@ This is a prototype for an AI-powered tax return assistant that enables users to
 
 ## Demo
 
+**Video Link**: [https://www.loom.com/share/e03f96415ce94ecc80043042f87fec52?sid=be422fbd-018a-4eb7-9e83-d9cbade466aa](https://www.loom.com/share/e03f96415ce94ecc80043042f87fec52?sid=be422fbd-018a-4eb7-9e83-d9cbade466aa)
+
 **Live Frontend**: [https://ai-tax-return-f117a8fd9825.herokuapp.com/](https://ai-tax-return-f117a8fd9825.herokuapp.com/)
 
 **Backend API**: [https://ai-tax-return-backend-92e5b1232028.herokuapp.com/docs](https://ai-tax-return-backend-92e5b1232028.herokuapp.com/docs)
@@ -85,17 +87,6 @@ Refer to the Swagger auto-generated API documentation: [https://ai-tax-return-ba
 
 ---
 
-## Screenshots
-
-_TODO: Insert annotated screenshots of the UI and sample outputs here._
-
-Suggested:
-- File upload screen
-- Summary with refund/amount due
-- Sample generated Form 1040 preview
-
----
-
 ## Security and Compliance Considerations
 
 While this is a prototype and not production-ready, the following concerns are acknowledged:
@@ -138,5 +129,62 @@ Challenges:
 - Limited scope of personal input support due to time constraints
 
 Next steps would focus on broadening filing scenarios, enhancing data privacy, and improving the user experience for a production-grade deployment.
+
+---
+
+## Screenshots
+
+Below is a walkthrough of the AI Tax Return Agent prototype using dummy W-2 and 1099 documents. The dummy documents can be found at [View dummy documents folder](backend/sample_docs/15).
+
+### User Flow
+
+1. **Landing Page**  
+   The home screen allows users to begin the process by uploading tax documents and selecting their filing status.
+
+   ![Landing Page](demo/1.png)
+
+2. **Upload Documents**  
+   Users can upload multiple PDFs, including W-2, 1099-INT, and 1099-NEC forms.
+
+   ![Upload documents](demo/2.png)
+
+3. **Frontend Parses and Displays Files**  
+   The frontend confirms that the documents have been received and are ready for processing.
+
+   ![Frontend obtained the documents](demo/3.png)
+
+4. **Send Documents to Server**  
+   Clicking the "Submit" button sends the uploaded documents to the backend for LLM-based extraction and tax computation.
+
+   ![Send the documents to server](demo/4.png)
+
+5. **Form 1040 is Generated**  
+   After processing, the backend returns a generated Form 1040 PDF with the calculated fields populated.
+
+   ![Get Form 1040](demo/5.png)
+
+6. **Preview of Filled Form 1040**  
+   Users can preview and download the populated Form 1040. PII fields are intentionally left blank in this prototype.
+
+   ![Preview of Form 1040](demo/6.png)
+
+---
+
+### Backend API (FastAPI)
+
+7. **API Documentation Overview**  
+   The backend is built with FastAPI and exposes auto-generated Swagger documentation.
+
+   ![Backend API documentation](demo/7.png)
+
+8. **Upload Endpoint**  
+   Endpoint to upload and extract data from tax documents.
+
+   ![Upload Documents API](demo/8.png)
+
+9. **Form 1040 Endpoint**  
+   Endpoint to retrieve the generated Form 1040 based on extracted and computed data.
+
+   ![Get Form 1040 API](demo/9.png)
 
 ---
