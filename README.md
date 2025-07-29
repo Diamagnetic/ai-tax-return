@@ -6,7 +6,7 @@ This is a prototype for an AI-powered tax return assistant that enables users to
 
 ## Demo
 
-**Video Link**: [https://www.loom.com/share/e03f96415ce94ecc80043042f87fec52?sid=be422fbd-018a-4eb7-9e83-d9cbade466aa](https://www.loom.com/share/e03f96415ce94ecc80043042f87fec52?sid=be422fbd-018a-4eb7-9e83-d9cbade466aa)
+**Video Link**: [AI Tax Return Prototype Loom Video](https://www.loom.com/share/e03f96415ce94ecc80043042f87fec52?sid=be422fbd-018a-4eb7-9e83-d9cbade466aa)
 
 **Live Frontend**: [https://ai-tax-return-f117a8fd9825.herokuapp.com/](https://ai-tax-return-f117a8fd9825.herokuapp.com/)
 
@@ -58,7 +58,7 @@ The system was tested using mock W-2, 1099-INT, and 1099-NEC documents containin
 - The dummy files include labeled fields like wages, federal income tax withheld, interest income, and nonemployee compensation.
 - These documents are not real and do not contain any PII.
 
-You can find them in the `dummy_docs/` folder (not included in this repository). Please request access separately if needed.
+You can find them in the [`backend/sample_docs/`](backend/sample_docs) folder (included in this repository). Please request access separately if needed.
 
 ---
 
