@@ -28,6 +28,28 @@ The frontend allows file uploads, displays tax calculation summaries, and serves
 
 ---
 
+## User Flow
+
+1. **Upload Documents**  
+   The user selects and uploads multiple tax documents (W-2, 1099-NEC, 1099-INT) via the frontend.
+
+2. **Document Analysis**  
+   Uploaded PDFs are sent to the backend, where an OpenAI LLM extracts key financial fields such as wages, nonemployee compensation, interest income, and tax withheld.
+
+3. **Income Aggregation**  
+   The extracted values from all documents are aggregated into a unified income and withholding summary.
+
+4. **Tax Calculation**  
+   The backend applies 2024 IRS tax brackets and the standard deduction (Single filing status) to compute estimated tax due or refund. The code is available at [`backend/services/tax_calculator.py`](backend/services/tax_calculator.py). The Tax Bracket is generated at [`backend/tax_policy/tax_policy_config.py`](backend/tax_policy/tax_policy_config.py).
+
+5. **Form 1040 Generation**  
+   A partially completed IRS Form 1040 is generated as a fillable PDF, populated with calculated tax data.
+
+6. **Preview and Download**  
+   The user can preview the generated form directly in the browser and download it as a completed PDF for review or filing.
+
+---
+
 ## Tech Stack
 
 **Frontend:**
