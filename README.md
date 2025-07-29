@@ -88,7 +88,6 @@ You can find them in the [`backend/sample_docs/`](backend/sample_docs) folder (i
 
 Tax logic and document parsing were tested using dummy PDFs. Validation includes:
 
-- Correct identification of form types
 - Accurate extraction of wage and tax data
 - Consistent application of 2024 IRS tax brackets
 - Correct aggregation across multiple documents
