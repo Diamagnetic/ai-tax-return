@@ -47,3 +47,25 @@ async def upload_documents(
   generate_filled_1040(temp_pdf_paths, input_pdf_path, output_pdf_path)
 
   return JSONResponse(content = { "document_id": document_id })
+
+# return form 1040 generated
+@router.get("/documents/{document_id}", response_class = FileResponse)
+async def get_generated_form1040(
+  background_tasks: BackgroundTasks,
+  document_id: str
+):
+  file_path = OUTPUT_DIR / document_id
+
+  if not file_path.exists():
+    return JSONResponse(
+      status_code = 404,
+      content = { "error" : "Document not found" }
+    )
+
+  background_tasks.add_task(file_path.unlink, missing_ok = True)
+
+  return FileResponse(
+    path = file_path,
+    media_type = "application/pdf",
+    filename = "filled_1040.pdf"
+  )
