@@ -134,7 +134,7 @@ Next steps would focus on broadening filing scenarios, enhancing data privacy, a
 
 ## Screenshots
 
-Below is a walkthrough of the AI Tax Return Agent prototype using dummy W-2 and 1099 documents. The dummy documents can be found at [View dummy documents folder](backend/sample_docs/15).
+Below is a walkthrough of the AI Tax Return Agent prototype using dummy W-2 and 1099 documents. The dummy documents can be found at [View dummy documents folder](backend/sample_docs/15). The resulting Form 1040 is available at [View Form 1040](demo/form_1040_15.pdf).
 
 ### User Flow
 
