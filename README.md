@@ -72,6 +72,10 @@ The frontend allows file uploads, displays tax calculation summaries, and serves
 **Data Validation:**
 - Pydantic v2 (for strict schema validation of extracted fields)
 
+**Deployment:**
+- **Heroku** (Used to host both frontend and backend services for public access)
+
+
 All dependencies are listed in `backend/requirements.txt`, and `frontend/requirements.txt`.
 
 ---
@@ -86,10 +90,10 @@ The architecture is designed to cleanly separate the user interface, backend log
 **Components:**
 
 - **Frontend (Streamlit):**  
-  Allows users to upload tax PDFs (e.g., W-2, 1099-INT, 1099-NEC), displays summaries, and lets users preview and download the generated Form 1040. Sends uploaded files to the backend via REST API.
+  Allows users to upload tax PDFs (e.g., W-2, 1099-INT, 1099-NEC), displays summaries, and lets users preview and download the generated Form 1040. Sends uploaded files to the backend via REST API. The frontend is deployed on **Heroku** for public access.
 
 - **Backend (FastAPI):**  
-  Handles PDF parsing, calls the OpenAI API to extract tax-relevant fields, aggregates the results, calculates tax liability using 2024 IRS brackets, and fills out a preformatted Form 1040.
+  Handles PDF parsing, calls the OpenAI API to extract tax-relevant fields, aggregates the results, calculates tax liability using 2024 IRS brackets, and fills out a preformatted Form 1040. The backend is also deployed on **Heroku**, exposing RESTful endpoints.
 
   - **LLM Integration (OpenAI API):**  
   Interprets uploaded documents and extracts structured fields like income and tax withheld, enabling automation of tax form generation.
