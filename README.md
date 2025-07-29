@@ -63,6 +63,9 @@ The frontend allows file uploads, displays tax calculation summaries, and serves
 - OpenAI API (LLM-based document field extraction)
 - PyMuPDF (PDF text insertion and form generation)
 
+**Form Design & Editing:**
+- Adobe Acrobat (Used to create fillable text fields in IRS Form 1040 downloaded from the official IRS website)
+
 **Form Filling and Testing:**
 - Faker (mock data generation for dummy documents)
 
@@ -72,6 +75,30 @@ The frontend allows file uploads, displays tax calculation summaries, and serves
 All dependencies are listed in `backend/requirements.txt`, and `frontend/requirements.txt`.
 
 ---
+
+## System Architecture
+
+The architecture is designed to cleanly separate the user interface, backend logic, and AI-powered document understanding.
+
+![System Architecture](architecture.jpg)  
+*Figure: High-level architecture of the AI Tax Return Agent prototype*
+
+**Components:**
+
+- **Frontend (Streamlit):**  
+  Allows users to upload tax PDFs (e.g., W-2, 1099-INT, 1099-NEC), displays summaries, and lets users preview and download the generated Form 1040. Sends uploaded files to the backend via REST API.
+
+- **Backend (FastAPI):**  
+  Handles PDF parsing, calls the OpenAI API to extract tax-relevant fields, aggregates the results, calculates tax liability using 2024 IRS brackets, and fills out a preformatted Form 1040.
+
+  - **LLM Integration (OpenAI API):**  
+  Interprets uploaded documents and extracts structured fields like income and tax withheld, enabling automation of tax form generation.
+
+  - **Tax Calculation Logic:**  
+    Applies the 2024 IRS tax brackets and standard deduction (currently fixed to "Single" filing status) to compute estimated tax due or refund based on aggregated income and withholdings.
+
+  - **PDF Handling (PyMuPDF):**  
+  Inserts values into a fillable version of Form 1040, and returns the completed PDF.
 
 ## Dummy Documents
 
