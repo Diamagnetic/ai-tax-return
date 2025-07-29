@@ -1,5 +1,5 @@
 build:
   docker:
-    backend: backend/Dockerfile
+    backend: Dockerfile
 run:
-  web: uvicorn app.backend.main:app
+  backend: uvicorn app.backend.main:app
