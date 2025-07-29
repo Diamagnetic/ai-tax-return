@@ -4,4 +4,5 @@ RUN mkdir /app
 WORKDIR /app/frontend
 COPY ./requirements.txt /app/frontend/requirements.txt
 COPY ./app.py /app/frontend/app.py
+COPY ./.streamlit/ /app/frontend/.streamlit/
 RUN pip install -r /app/frontend/requirements.txt

@@ -72,8 +72,10 @@ def main():
   st.markdown("---")
   
   # File Upload Section
-  st.header("Upload PDF Files")
-  
+  st.header("1. Upload PDF Files")
+
+  st.markdown("Please upload tax documents such as **W-2**, **1099-NEC**, and **1099-INT** in PDF format.")  
+
   # File uploader
   uploaded_files = st.file_uploader(
     "Choose PDF files",
@@ -119,7 +121,7 @@ def main():
   st.markdown("---")
   
   # Form Retrieval Section
-  st.header("Get Form 1040")
+  st.header("2. Get Form 1040")
   
   if not st.session_state.form_data:
     col1, col2 = st.columns([1, 4])
@@ -159,7 +161,7 @@ def main():
   # Display form preview and download option
   if st.session_state.form_data:
     st.markdown("---")
-    st.header("Form Preview")
+    st.header("3. Form Preview")
     
     # Preview and download buttons
     col1, col2, col3 = st.columns([1, 1, 3])
@@ -185,7 +187,18 @@ def main():
       st.error(f"Could not display PDF preview: {str(e)}")
       st.info("You can still download the file using the download button above.")
   
+  # Footer
   st.markdown("---")
+
+  st.markdown(
+    """
+    <div style='text-align: center; font-size: 0.9em; color: gray;'>
+      Built by <b>Chirag Dhamange</b> · 
+      <a href='https://github.com/Diamagnetic/ai-tax-return' target='_blank'>Source Code</a>
+    </div>
+    """,
+    unsafe_allow_html=True
+  )
  
 if __name__ == "__main__":
   main()
