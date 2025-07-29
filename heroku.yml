@@ -2,4 +2,5 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: uvicorn app.backend.main:app
+  web: streamlit run app.py --client.toolbarMode=minimal --client.showErrorDetails=false
+  worker: uvicorn app.backend.main:app
