@@ -15,7 +15,7 @@ if TAX_POLICY_DIR not in sys.path:
 
 from form_extractor import FormExtractor
 from form_generator import Form1040Generator
-from tax_schema import TaxFormData
+from tax_schema import TaxFormData, TaxReturnSummary
 from tax_policy_config import SingleFiler2024Config
 from user_pii import UserPII, FilingType
 
@@ -29,7 +29,7 @@ def generate_filled_1040(
   extractor = FormExtractor()
   tax_form_data: TaxFormData = extractor.extract_from_pdfs(file_buffers)
 
-  filing_type : FilingType = pii.filing_type
+  filing_type : FilingType = pii.filing_status
 
   config_map : Dict[FilingType, Type[TaxPolicyConfigBase]] = {
     FilingType.single: SingleFiler2024Config,
