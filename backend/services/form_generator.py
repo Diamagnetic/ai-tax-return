@@ -115,9 +115,9 @@ class Form1040Generator:
     data: TaxFormData,
     pii: UserPII,
     output_pdf_path: str
-  ) -> None:
+  ) -> TaxReturnSummary:
     # Calculate tax summary
-    summary = self.calculator.summarize(data)
+    summary : TaxReturnSummary = self.calculator.summarize(data)
 
     # Create the form model using summary
     form = self._create_form_1040(data, pii, summary)
@@ -136,3 +136,5 @@ class Form1040Generator:
 
     doc.save(output_pdf_path)
     doc.close()
+
+    return summary
