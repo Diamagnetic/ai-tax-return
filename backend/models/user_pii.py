@@ -1,0 +1,40 @@
+from pydantic import BaseModel, Field
+from typing import Optional
+
+class UserPII(BaseModel):
+   # PII
+  first_name_middle_initial: str = Field(
+    alias = "first_name_middle_initial",
+    description = "First name and middle initial"
+  )
+  last_name: str = Field(
+    alias = "last_name",
+    description = "Last name"
+  )
+  ssn: str = Field(
+    alias = "ssn",
+    description = "Social Security Number"
+  )
+  address: str = Field(
+    alias = "home_address",
+    description = "Home address (street and number)"
+  )
+  apt_no: str = Field(
+    alias = "apt_no",
+    description = "Apartment number (if any)"
+  )
+  city: str = Field(
+    alias = "city",
+    description = "City"
+  )
+  state: str = Field(
+    alias = "state",
+    description = "State"
+  )
+  # 5 digit zip code for now
+  zip_code: str = Field(
+    alias = "zip_code",
+    description = "ZIP code"
+  )
+
+  model_config = { "populate_by_name": True }
