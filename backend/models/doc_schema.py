@@ -1,10 +1,18 @@
 from pydantic import BaseModel, Field
 from decimal import Decimal
+import os
+import sys
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+if MODELS_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+
+from user_pii import UserPII
 
 class Form1040(BaseModel):
-  wages: Decimal = Field(
-    alias = "1a",
-    description = "Wages, salaries, tips from Form W-2, Box 1"
+  pii: UserPII = Field(
+    description = "Personally identifiable information of the taxpayer"
   )
   taxable_interest: Decimal = Field(
     alias = "2b",
