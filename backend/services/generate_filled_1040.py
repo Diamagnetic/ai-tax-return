@@ -15,7 +15,7 @@ if TAX_POLICY_DIR not in sys.path:
 
 from form_extractor import FormExtractor
 from form_generator import Form1040Generator
-from tax_calculator import TaxFormData
+from tax_schema import TaxFormData
 from tax_policy_config import SingleFiler2024Config
 from user_pii import UserPII, FilingType
 
