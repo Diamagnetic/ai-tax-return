@@ -1,8 +1,15 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from enum import Enum
+
+
+class FilingType(str, Enum):
+  single = "Single"
+  married_joint = "Married Filing Jointly"
+  married_separate = "Married Filing Separately"
+  head_of_household = "Head of Household"
+  qualifying_spouse = "Qualifying Surviving Spouse"
 
 class UserPII(BaseModel):
-   # PII
   first_name_middle_initial: str = Field(
     alias = "first_name_middle_initial",
     description = "First name and middle initial"
@@ -35,6 +42,11 @@ class UserPII(BaseModel):
   zip_code: str = Field(
     alias = "zip_code",
     description = "ZIP code"
+  )
+  filing_status: FilingType = Field(
+    default=FilingType.single,
+    alias = "filing_status",
+    description = "Filing status for the tax return"
   )
 
   model_config = { "populate_by_name": True }
