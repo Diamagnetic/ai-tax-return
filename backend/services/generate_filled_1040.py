@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Type
 import os
 import sys
 
@@ -24,26 +24,28 @@ def generate_filled_1040(
   pii: UserPII,
   input_pdf_path: Path,
   output_pdf_path: Path
-) -> None:
+) -> TaxReturnSummary:
   # Extract tax data
   extractor = FormExtractor()
   tax_form_data: TaxFormData = extractor.extract_from_pdfs(file_buffers)
 
-  filing_type = pii.filing_type
+  filing_type : FilingType = pii.filing_type
 
-  config_map = {
+  config_map : Dict[FilingType, Type[TaxPolicyConfigBase]] = {
     FilingType.single: SingleFiler2024Config,
     # Add more mappings when other configs exist
   }
 
-  tax_config_cls = config_map[filing_type]
+  tax_config_cls : FilingType = config_map[filing_type]
 
   generator = Form1040Generator(tax_config_cls)
 
   # Calculate tax summary
-  generator.generate_pdf(
+  tax_return_summary : TaxReturnSummary = generator.generate_pdf(
     input_pdf_path = input_pdf_path,
     pii = pii,
     data = tax_form_data,
     output_pdf_path = output_pdf_path
   )
+
+  return tax_return_summary
