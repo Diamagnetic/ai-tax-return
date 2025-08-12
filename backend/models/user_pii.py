@@ -26,7 +26,8 @@ class UserPII(BaseModel):
     alias = "home_address",
     description = "Home address (street and number)"
   )
-  apt_no: str = Field(
+  apt_no: str | None = Field(
+    default = None,
     alias = "apt_no",
     description = "Apartment number (if any)"
   )
