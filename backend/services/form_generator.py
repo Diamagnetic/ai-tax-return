@@ -93,11 +93,11 @@ class Form1040Generator:
 
   @_checkbox_decorator(
     mapping = {
-      FilingType.single            : "filing_status_single",
-      FilingType.married_joint     : "filing_status_married_joint",
-      FilingType.married_separate  : "filing_status_married_separate",
-      FilingType.head_of_household : "filing_status_head",
-      FilingType.qualifying_spouse : "filing_status_qualifying_spouse"
+      FilingType.single            : "filing_status_single_checkbox",
+      FilingType.married_joint     : "filing_status_married_joint_checkbox",
+      FilingType.married_separate  : "filing_status_married_separate_checkbox",
+      FilingType.head_of_household : "filing_status_head_checkbox",
+      FilingType.qualifying_spouse : "filing_status_qualifying_spouse_checkbox"
     },
     field_attr = "filing_status"
   )
