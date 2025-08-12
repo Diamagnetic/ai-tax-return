@@ -58,7 +58,7 @@ async def upload_documents(
     "first_name_middle_initial" : first_name_middle_initial,
     "last_name"                 : last_name,
     "ssn"                       : ssn,
-    "home_address"              : home_address,
+    "address"                   : home_address,
     "apt_no"                    : apt_no,
     "city"                      : city,
     "state"                     : state,

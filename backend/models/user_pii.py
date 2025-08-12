@@ -23,7 +23,7 @@ class UserPII(BaseModel):
     description = "Social Security Number"
   )
   address: str = Field(
-    alias = "home_address",
+    alias = "address",
     description = "Home address (street and number)"
   )
   apt_no: str | None = Field(
