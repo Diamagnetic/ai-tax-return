@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Type
 import pymupdf
 from pydantic import BaseModel
+from functools import wraps
 import os
 import sys
 
@@ -19,6 +20,7 @@ from tax_calculator import TaxCalculator, TaxReturnSummary, TaxFormData
 from tax_policy_config import SingleFiler2024Config
 from tax_schema import TaxBracket
 from doc_schema import Form1040
+from user_pii import UserPII, FilingType
 
 class Form1040Generator:
   def __init__(self, tax_config_cls: Type[SingleFiler2024Config]):
@@ -31,11 +33,13 @@ class Form1040Generator:
   def _create_form_1040(
     self,
     data: TaxFormData,
+    pii: UserPII,
     summary: TaxReturnSummary
   ) -> Form1040:
     total_income = summary.total_income
 
     return Form1040(
+      pii                   = pii,
       wages                 = data.w2.wages,
       taxable_interest      = data.int_1099.interest_income,
       other_income          = data.nec_1099.nonemployee_compensation,
@@ -68,20 +72,67 @@ class Form1040Generator:
           field.field_value = str(alias_map[key])
           field.update()
 
+  @staticmethod
+  def _checkbox_decorator(mapping: dict, field_attr: str):
+    def decorator(func):
+      @wraps(func)
+      def wrapper(self, doc: pymupdf.Document, data: BaseModel):
+        result = func(self, doc, data)
+        checkbox_field = mapping.get(getattr(data, field_attr, None))
+
+        if checkbox_field:
+          for page in doc:
+            for widget in page.widgets():
+              if widget.field_name == checkbox_field:
+                widget.field_value = "Yes"
+                widget.update()
+
+        return result
+      return wrapper
+    return decorator
+
+  @_checkbox_decorator(
+    mapping = {
+      FilingType.single            : "filing_status_single",
+      FilingType.married_joint     : "filing_status_married_joint",
+      FilingType.married_separate  : "filing_status_married_separate",
+      FilingType.head_of_household : "filing_status_head",
+      FilingType.qualifying_spouse : "filing_status_qualifying_spouse"
+    },
+    field_attr = "filing_status"
+  )
+  def _fill_filing_status_checkbox(
+    self,
+    doc: pymupdf.Document,
+    data: BaseModel
+  ):
+    # Decorator does the work
+    pass
+
   def generate_pdf(
     self,
     input_pdf_path: str,
     data: TaxFormData,
+    pii: UserPII,
     output_pdf_path: str
   ) -> None:
     # Calculate tax summary
     summary = self.calculator.summarize(data)
 
     # Create the form model using summary
-    form = self._create_form_1040(data, summary)
+    form = self._create_form_1040(data, pii, summary)
 
     # Load PDF and fill text fields
     doc = pymupdf.open(input_pdf_path)
+
+    # Fill tax form data
     self._fill_textfields(doc, form)
+
+    # Fill PII
+    self._fill_textfields(doc, pii)
+
+    # Tick checkbox
+    self._fill_filing_status_checkbox(doc, pii)
+
     doc.save(output_pdf_path)
     doc.close()
