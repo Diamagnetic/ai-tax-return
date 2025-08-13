@@ -1,17 +1,13 @@
 import streamlit as st
-import requests
 import io
 import base64
 from typing import List, Optional
 import time
-from pathlib import Path
-import sys
+import re
+from decimal import Decimal, InvalidOperation
 
-CURRENT_DIR = Path(__file__).resolve().parent
-
-sys.path.append(str(CURRENT_DIR))
-
-from config import SERVER_URL, UPLOAD_ENDPOINT, GET_FORM_ENDPOINT
+from api_client import submit_tax_form, get_form_from_server
+from user_pii_model import FrontUserPII, FilingType, US_STATE_ABBRS
 
 # Configure page
 st.set_page_config(
@@ -20,6 +16,8 @@ st.set_page_config(
 )
 
 # Initialize session state
+if "tax_summary" not in st.session_state:
+  st.session_state.tax_summary = None
 if "uploaded_files" not in st.session_state:
   st.session_state.uploaded_files = []
 if "processing_status" not in st.session_state:
@@ -28,39 +26,6 @@ if "form_data" not in st.session_state:
   st.session_state.form_data = None
 if "document_id" not in st.session_state:
   st.session_state.document_id = None
-
-def upload_files_to_server(files: List) -> Optional[str]:
-  try:
-    files_data = []
-    for file in files:
-      files_data.append(("files", (file.name, file.getvalue(), file.type)))
-    
-    response = requests.post(UPLOAD_ENDPOINT, files = files_data, timeout = 30)
-    if response.status_code == 200:
-      response_json = response.json()
-      return response_json.get("document_id")
-    else:
-      st.error(f"Upload failed with status code: {response.status_code}")
-      return None
-  except requests.exceptions.RequestException as e:
-    st.error(f"Upload failed: {str(e)}")
-    return None
-  except Exception as e:
-    st.error(f"Error parsing response: {str(e)}")
-    return None
-
-def get_form_from_server(document_id: str) -> Optional[bytes]:
-  try:
-    form_endpoint = f"{GET_FORM_ENDPOINT}/{document_id}"
-    response = requests.get(form_endpoint, timeout = 30)
-    if response.status_code == 200:
-      return response.content
-    else:
-      st.error(f"Failed to get form: {response.status_code}")
-      return None
-  except requests.exceptions.RequestException as e:
-    st.error(f"Request failed: {str(e)}")
-    return None
 
 def display_pdf_preview(pdf_data: bytes):
   base64_pdf = base64.b64encode(pdf_data).decode("utf-8")
@@ -71,58 +36,157 @@ def display_pdf_preview(pdf_data: bytes):
   """
   st.markdown(pdf_display, unsafe_allow_html = True)
 
+# Helper to submit files + PII together
+def submit_files_and_pii(files, pii : FrontUserPII) -> bool:
+  result = submit_tax_form(files, pii)
+
+  if result:
+    st.session_state.document_id = result.get("document_id")
+    st.session_state.tax_summary = result.get("tax_return_summary")
+    st.session_state.processing_status = "completed"
+    return True
+
+  st.session_state.processing_status = "failed"
+
+  return False
+
+def _to_decimal(v) -> Decimal:
+  try:
+    return v if isinstance(v, Decimal) else Decimal(str(v))
+  except Exception:
+    return Decimal("0")
+
+def _fmt_money(v) -> str:
+  d = _to_decimal(v).quantize(Decimal("0.01"))
+  return f"${d}"
+
 def main():
   st.title("AI Tax Return")
   st.markdown("---")
-  
-  # File Upload Section
-  st.header("1. Upload PDF Files")
 
-  st.markdown("Please upload tax documents such as **W-2**, **1099-NEC**, and **1099-INT** in PDF format.")  
-
-  # File uploader
-  uploaded_files = st.file_uploader(
-    "Choose PDF files",
-    type = ["pdf"],
-    accept_multiple_files = True,
-    help = "Select one or more PDF files to process"
-  )
+  # Step 1: Upload files + Enter PII
+  st.header("1. Upload PDF Files & Enter Personal Information")
+  st.markdown("Upload **W-2**, **1099-NEC**, and/or **1099-INT** (PDF). Then enter your details.")
   
-  # Display currently selected files
-  if uploaded_files:
-    st.session_state.uploaded_files = uploaded_files
-    st.success(f"Selected {len(uploaded_files)} file(s)")
+  left, right = st.columns(2)
   
-  # Upload button
-  col1, col2 = st.columns([1, 4])
-  with col1:
-    upload_button = st.button(
-      "Upload Files",
-      disabled = len(st.session_state.uploaded_files) == 0,
-      type = "primary"
+  with left:
+    uploaded_files = st.file_uploader(
+      "Choose up to 3 PDF files",
+      type = ["pdf"],
+      accept_multiple_files = True,
+      help = "Only PDF files are accepted"
     )
+
+    if uploaded_files:
+      st.session_state.uploaded_files = uploaded_files
+      st.success(f"Selected {len(uploaded_files)} file(s)")
   
-  # Handle upload
-  if upload_button and st.session_state.uploaded_files:
-    with st.spinner("Uploading files to server..."):
-      progress_bar = st.progress(0)
-      
-      # Simulate upload progress
-      for i in range(100):
-        time.sleep(0.01)  # Small delay for visual effect
-        progress_bar.progress(i + 1)
-      
-      document_id = upload_files_to_server(st.session_state.uploaded_files)
-      
-      if document_id:
-        st.session_state.document_id = document_id
-        st.success("Files uploaded successfully!")
-        st.session_state.processing_status = "completed"
-      else:
-        st.error("Upload failed. Please try again.")
-        st.session_state.processing_status = "failed"
+  with right:
+    with st.form("pii_form"):
+      c1, c2 = st.columns(2)
+      with c1:
+        first_name_middle_initial = st.text_input(
+          "First name and middle initial"
+        )
+      with c2:
+        last_name = st.text_input("Last name")
+  
+      c3, c4 = st.columns(2)
+      with c3:
+        ssn = st.text_input("SSN (9 digits, numbers only)")
+      with c4:
+        filing = st.radio(
+          "Filing status",
+          [ft.value for ft in FilingType],
+          index = 0,
+          disabled = True,
+          help = "Only 'Single' Filing Status is supported right now."
+        )
+  
+      address = st.text_input("Home address (street and number)")
+      apt_no = st.text_input("Apartment number (optional)")
+  
+      c5, c6, c7 = st.columns([1, 1, 1])
+      with c5:
+        city = st.text_input("City")
+      with c6:
+        state = st.selectbox(
+          "State (2-letter)",
+          US_STATE_ABBRS,
+          index = US_STATE_ABBRS.index("CA")
+        )
+      with c7:
+        zip_code = st.text_input(
+          "ZIP code (5 digits)"
+        )
+  
+      submit_btn = st.form_submit_button(
+        "Submit",
+        type = "primary",
+        disabled = len(st.session_state.uploaded_files) == 0
+      )
+  
+      if submit_btn:
+        ssn = re.sub(r"\D", "", ssn or "")
+        zip_code = re.sub(r"\D", "", zip_code or "")
+
+        # Build PII model and validate on the frontend
+        try:
+          pii = FrontUserPII(
+            first_name_middle_initial = first_name_middle_initial,
+            last_name                 = last_name,
+            ssn                       = ssn,
+            address                   = address,
+            apt_no                    = apt_no or None,
+            city                      = city,
+            state                     = state,
+            zip_code                  = zip_code,
+            filing_status             = FilingType.single
+          )
+        except Exception as e:
+          # Pydantic error object pretty-print
+          from pydantic import ValidationError
+          if isinstance(e, ValidationError):
+            for err in e.errors():
+              st.error(f"{err['loc'][0]}: {err['msg']}")
+          else:
+            st.error(str(e))
+        else:
+          with st.spinner("Calculating your tax return..."):
+            is_ok = submit_files_and_pii(st.session_state.uploaded_files, pii)
+          if is_ok:
+            st.success("Submitted successfully!")
+          else:
+            st.error("Submission failed. Please check inputs and try again.")
   
   st.markdown("---")
+
+  if st.session_state.get("tax_summary"):
+    tax_summary = st.session_state.tax_summary
+    st.subheader("Submission Summary")
+
+    top_left, top_right = st.columns([1, 1])
+  
+    with top_left:
+      st.markdown("**Calculated Amounts**")
+      st.markdown(
+        f"- Estimated tax due: {_fmt_money(tax_summary.get('estimated_tax_due'))}\n"
+        f"- Refund: {_fmt_money(tax_summary.get('estimated_refund'))}\n"
+        f"- Amount owed: {_fmt_money(tax_summary.get('amount_owed'))}\n"
+        f"- Total income: {_fmt_money(tax_summary.get('total_income'))}\n"
+        f"- Taxable income: {_fmt_money(tax_summary.get('taxable_income'))}\n"
+        f"- Total tax withheld: {_fmt_money(tax_summary.get('total_tax_withheld'))}"
+      )
+  
+    with top_right:
+      # Forms submitted
+      forms = tax_summary.get("forms_submitted") or []
+      if forms:
+        st.markdown("**Forms Uploaded**")
+        st.write(", ".join(forms))
+
+    st.markdown("---")
   
   # Form Retrieval Section
   st.header("2. Get Form 1040")
