@@ -17,33 +17,40 @@ The current flow submits files + Personal Identifiable Information (PII) togethe
 ## Features
 
 - Upload and process multiple PDF files (W-2, 1099-NEC, 1099-INT)
-- Extract tax-relevant data using OpenAI LLM
-- Aggregate income and tax withholding
-- Compute tax liability using 2024 brackets and standard deduction
-- Generate a downloadable pre-filled IRS Form 1040 (PDF)
-  - Preview before downloading
-- Display user-friendly output and error messages
+- Enter personal information (first name + middle initial, last name, SSN 9-digit, address, optional apt no, city, state dropdown, ZIP 5-digit) with frontend validation
+- Choose filing status (Single supported today; others shown but disabled)
+- LLM-based extraction of wages, nonemployee compensation, interest, and withholding
+- Aggregate income and compute taxes using 2024 brackets and standard deduction
+- Generate a pre-filled Form 1040 (PDF) and preview in the browser
+- Submission Summary showing detected forms, totals (tax due, refund, amount owed), and uploaded filenames
+- Clear, user-friendly success and error messages
 
 ---
 
 ## User Flow
 
 1. **Upload Documents**  
-   The user selects and uploads multiple tax documents (W-2, 1099-NEC, 1099-INT) via the frontend.
+   The user selects up to three PDFs (W-2, 1099-NEC, 1099-INT) and enters personal info (with SSN/ZIP digit-only and state dropdown). Filing status is Single for now.
 
-2. **Document Analysis**  
+2. **Submit**
+   Frontend posts __multipart/form-data__ to the backend endpoint `POST /submit_tax_form` (files + PII together).
+
+3. **Document Analysis**  
    Uploaded PDFs are sent to the backend, where an OpenAI LLM extracts key financial fields such as wages, nonemployee compensation, interest income, and tax withheld.
 
-3. **Income Aggregation**  
+4. **Income Aggregation**  
    The extracted values from all documents are aggregated into a unified income and withholding summary.
 
-4. **Tax Calculation**  
+5. **Tax Calculation**  
    The backend applies 2024 IRS tax brackets and the standard deduction (Single filing status) to compute estimated tax due or refund. The code is available at [`backend/services/tax_calculator.py`](backend/services/tax_calculator.py). The Tax Bracket is generated at [`backend/tax_policy/tax_policy_config.py`](backend/tax_policy/tax_policy_config.py).
 
-5. **Form 1040 Generation**  
-   A partially completed IRS Form 1040 is generated as a fillable PDF, populated with calculated tax data.
+6. **Form 1040 Generation**  
+   A complete IRS Form 1040 is generated as a fillable PDF, populated with calculated tax data, and personal info.
 
-6. **Preview and Download**  
+7. **Submission Summary**
+   The frontend displays type of forms submitted, and the totals (tax due, refund, amount owed).
+
+8. **Preview and Download**  
    The user can preview the generated form directly in the browser and download it as a completed PDF for review or filing.
 
 ---
@@ -52,6 +59,8 @@ The current flow submits files + Personal Identifiable Information (PII) togethe
 
 **Frontend:**
 - Streamlit (UI and file upload interface)
+- Pydantic v2 (client-side validation)
+- Requests (API client)
 
 **Backend:**
 - FastAPI (REST API layer)
@@ -141,11 +150,10 @@ Refer to the Swagger auto-generated API documentation: [https://ai-tax-return-ba
 
 While this is a prototype and not production-ready, the following concerns are acknowledged:
 
-- **No sensitive user input (PII) is collected** at this stage (e.g., name, SSN, address)
-- Files are processed temporarily and are not stored permanently
-- For LLM extraction, redaction strategies are needed to mask PII before sending data to external APIs
-  - In my prototype, the backend server itself does not collect any PII
-- A production version would require secure additional file handling, input validation, encryption, and audit logging
+- The frontend now collects personal information (name, SSN, address, state, ZIP, filing status) with client-side validation.
+- PII and files are sent over HTTPS to the backend for on-the-fly processing. Temporary files are created during extraction and form generation.
+- This prototype does not include production controls such as long-term encrypted storage, audited access controls, key management, or data retention policies.
+- A production system should implement: encryption in transit and at rest, limited retention with secure deletion, secret management, audit logs, PII redaction prior to LLM calls, and comprehensive compliance reviews.
 
 ---
 
@@ -153,14 +161,12 @@ While this is a prototype and not production-ready, the following concerns are a
 
 The current implementation prioritizes core functionality. Planned or recommended enhancements include:
 
-- Accepting and populating personal information (name, SSN, address, filing status)
-- Supporting additional filing statuses beyond single
-- Implementing redaction for sensitive information before LLM inference
-- Using Retrieval-Augmented Generation (RAG) or fine-tuned lightweight models for offline parsing
-- Adding support for additional tax forms (e.g., Schedule C, 1098)
+- Support additional filing statuses (Married Joint/Separate, Head of Household, Qualifying Surviving Spouse)
+- Robust PII redaction strategies prior to LLM calls
+- RAG or tuned lightweight models for deterministic field extraction
+- Adding support for additional tax forms
 - Real-time error messages and guided walkthrough for users
 - State return and itemized deduction support
-- Frontend enhancements (mobile responsiveness, form previews, progress steps)
 
 ---
 
