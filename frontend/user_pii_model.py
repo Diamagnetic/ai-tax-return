@@ -78,3 +78,7 @@ class FrontUserPII(BaseModel):
       raise ValueError("Invalid U.S. state abbreviation")
 
     return abbr
+
+  model_config = {
+    "use_enum_values"  : True    # dump Enums as their .value strings
+  }
