@@ -5,6 +5,7 @@ This is a prototype for an AI-powered tax return assistant that lets users uploa
 ---
 
 ## Demo
+**Demo Link**: [https://www.loom.com/share/29d10ec035db47e68e2fa76df7156ec1?sid=cfb17204-bebc-4349-b149-2e6da1c0cbc5](https://www.loom.com/share/29d10ec035db47e68e2fa76df7156ec1?sid=cfb17204-bebc-4349-b149-2e6da1c0cbc5)
 
 **Live Frontend**: [https://ai-tax-return-f117a8fd9825.herokuapp.com/](https://ai-tax-return-f117a8fd9825.herokuapp.com/)
 
