@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from typing import List, Annotated
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from pydantic import ValidationError
 import sys
 import uuid
 
@@ -46,7 +47,21 @@ async def upload_documents(
   files                     : List[UploadFile] = File(...),
 ):
   temp_pdf_paths = []
+  
+  if not (1 <= len(files) <= 3):
+    return JSONResponse(
+        status_code = 400,
+        content = { "error" : "You must upload between 1 and 3 PDF files." }
+    )
+
   for file in files:
+    if file.content_type != "application/pdf" or not file.filename.endswith(".pdf"):
+      return JSONResponse(
+        status_code = 400,
+        content = {
+          "error": f"Invalid file type: {file.filename}. Only PDF files are accepted."
+        }
+      )
     content = await file.read()
     with NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
       tmp.write(content)
@@ -54,17 +69,26 @@ async def upload_documents(
       temp_pdf_paths.append(temp_path)
       background_tasks.add_task(temp_path.unlink, missing_ok=True)
 
-  pii = UserPII.model_validate({
-    "first_name_middle_initial" : first_name_middle_initial,
-    "last_name"                 : last_name,
-    "ssn"                       : ssn,
-    "address"                   : home_address,
-    "apt_no"                    : apt_no,
-    "city"                      : city,
-    "state"                     : state,
-    "zip_code"                  : zip_code,
-    "filing_status"             : filing_status,
-  })
+  try:
+    pii = UserPII.model_validate({
+      "first_name_middle_initial" : first_name_middle_initial,
+      "last_name"                 : last_name,
+      "ssn"                       : ssn,
+      "address"                   : home_address,
+      "apt_no"                    : apt_no,
+      "city"                      : city,
+      "state"                     : state,
+      "zip_code"                  : zip_code,
+      "filing_status"             : filing_status,
+    })
+  except ValidationError as e:
+    return JSONResponse(
+        status_code = 422,
+        content = {
+          "error" : "Invalid personal information.",
+          "details" : e.errors()
+        }
+    )
 
   input_pdf_path = (
     CURRENT_DIR / "../static/templates/f1040_2024.pdf"
@@ -73,12 +97,20 @@ async def upload_documents(
   document_id = f"{uuid.uuid4().hex}.pdf"
   output_pdf_path = OUTPUT_DIR / document_id
 
-  tax_return_summary : TaxReturnSummary = generate_filled_1040(
-    file_buffers = temp_pdf_paths,
-    pii = pii,
-    input_pdf_path = input_pdf_path,
-    output_pdf_path = output_pdf_path
-  )
+  try:
+    tax_return_summary : TaxReturnSummary = generate_filled_1040(
+      file_buffers = temp_pdf_paths,
+      pii = pii,
+      input_pdf_path = input_pdf_path,
+      output_pdf_path = output_pdf_path
+    )
+  except Exception as e:
+    return JSONResponse(
+        status_code = 500,
+        content = {
+          "error" : "An unexpected error occurred during tax form processing. Please try again later"
+        }
+    )
 
   return JSONResponse(content = {
     "document_id" : document_id,
