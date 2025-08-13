@@ -20,7 +20,7 @@ def submit_tax_form(
 
     response = requests.post( 
       SUBMIT_ENDPOINT,
-      data = pii.model_dump(by_alias = True, exclude_none = True),
+      data = pii.model_dump(),
       files = files_data
     )
 
