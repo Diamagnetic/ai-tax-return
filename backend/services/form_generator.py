@@ -50,13 +50,8 @@ class Form1040Generator:
       federal_tax_withheld  = data.w2.federal_income_tax_withheld,
       total_payments        = summary.total_tax_withheld,
       refund                = summary.estimated_refund,
-      taxable_income        = (
-        total_income - self.tax_config.get_standard_deduction()
-      ),
-      amount_owed           = max(
-        summary.estimated_tax_due - summary.total_tax_withheld,
-        Decimal("0")
-      )
+      taxable_income        = summary.taxable_income,
+      amount_owed           = summary.amount_owed
     )
 
   def _fill_textfields(self, doc: pymupdf.Document, data: BaseModel) -> None:
