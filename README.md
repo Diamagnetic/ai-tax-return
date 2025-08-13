@@ -214,7 +214,7 @@ Below is a walkthrough of the AI Tax Return Agent prototype using dummy W-2 and 
    Upon successful processing, the backend sends a response containing the tax return summary.
 
 7. **Retrieve Form 1040**
-   ![Retrieve Form 1040](demo/.png) 
+   ![Retrieve Form 1040](demo/7.png) 
    A this step, the frontend can fetch the completed Form 1040 from the backend by clicking on the `Get Form 1040` button.
 
 8. **Preview of Form 1040**  
