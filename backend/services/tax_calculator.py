@@ -40,9 +40,19 @@ class TaxCalculator:
     estimated_tax_due = self.calculate_tax(taxable_income)
     estimated_refund = max(tax_withheld - estimated_tax_due, Decimal("0"))
 
+    if tax_withheld >= estimated_tax_due:
+      estimated_refund = tax_withheld - estimated_tax_due
+      amount_owed = Decimal("0")
+    else:
+      estimated_refund = Decimal("0")
+      amount_owed = estimated_tax_due - tax_withheld
+
     return TaxReturnSummary(
+      forms_submitted = data.forms_submitted,
       total_income = total_income.quantize(Decimal("0.01")),
+      taxable_income = taxable_income
       total_tax_withheld = tax_withheld.quantize(Decimal("0.01")),
       estimated_tax_due = estimated_tax_due,
-      estimated_refund = estimated_refund
+      estimated_refund = estimated_refund,
+      amount_owed = amount_owed
     )
