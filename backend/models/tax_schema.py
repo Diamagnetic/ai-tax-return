@@ -2,46 +2,40 @@ from pydantic import BaseModel, Field, field_validator
 from typing import Any
 from decimal import Decimal
 
-# Decorator to inject a validator
-def validate_fields(fields: list[str]):
-  def decorator(cls):
-    # Pydantic v2 field validator for stripping commas from Decimal fields
-    # This happens before the fields are further type-validated by the classes
-    @field_validator(*fields, mode = "before")
-    @classmethod
-    def strip_commas(cls, v: Any) -> Decimal:
-      # If the input is a string with commas, remove them before parsing to Decimal
-      if isinstance(v, str):
-        v = v.replace(",", "")
-      return Decimal(v)
-    # Attach the validator to the class dynamically
-    setattr(cls, "strip_commas", strip_commas)
-    return cls
-  return decorator
+class DecimalSanitizer(BaseModel):
+  @field_validator("*", mode = "before")
+  @classmethod
+  def _sanitize(cls, v: Any) -> Decimal:
+    if isinstance(v, str):
+      v = v.replace(",", "").strip()
+      if v == "":
+        return Decimal("0")
+    return Decimal(v)
 
-@validate_fields(["wages", "federal_income_tax_withheld"])
-class W2Data(BaseModel):
+class W2Data(DecimalSanitizer):
   wages: Decimal = Field(ge = 0)
   federal_income_tax_withheld : Decimal = Field(ge = 0)
 
-@validate_fields(["nonemployee_compensation"])
-class NECData(BaseModel):
-  nonemployee_compensation: Decimal = Field(ge = 0)
+class NECData(DecimalSanitizer):
+  nonemployee_compensation: Decimal = Field(default = Decimal("0"), ge = 0)
 
-@validate_fields(["interest_income"])
-class INTData(BaseModel):
-  interest_income: Decimal = Field()
+class INTData(DecimalSanitizer):
+  interest_income: Decimal = Field(default = Decimal("0"))
 
 class TaxFormData(BaseModel):
+  forms_submitted: list[str] = Field(default_factory = list)
   w2: W2Data = Field(alias = "w2")
-  nec_1099: NECData = Field(alias = "1099_nec")
-  int_1099: INTData = Field(alias = "1099_int")
+  nec_1099: NECData = Field(default_factory = NECData, alias = "1099_nec")
+  int_1099: INTData = Field(default_factory = INTData, alias = "1099_int")
 
 class TaxReturnSummary(BaseModel):
+  forms_submitted: list[str] = Field(default_factory = list)
   total_income: Decimal = Field(ge = 0)
+  taxable_income: Decimal = Field(ge = 0)
   total_tax_withheld: Decimal = Field(ge = 0)
   estimated_tax_due: Decimal = Field(ge = 0)
   estimated_refund: Decimal = Field(ge = 0)
+  amount_owed: Decimal = Field(ge = 0)
 
 class TaxBracket(BaseModel):
   lower_limit: Decimal = Field(ge = 0)
