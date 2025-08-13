@@ -4,6 +4,14 @@ import io
 import base64
 from typing import List, Optional
 import time
+from pathlib import Path
+import sys
+
+CURRENT_DIR = Path(__file__).resolve().parent
+
+sys.path.append(str(CURRENT_DIR))
+
+from config import SERVER_URL, UPLOAD_ENDPOINT, GET_FORM_ENDPOINT
 
 # Configure page
 st.set_page_config(
@@ -20,10 +28,6 @@ if "form_data" not in st.session_state:
   st.session_state.form_data = None
 if "document_id" not in st.session_state:
   st.session_state.document_id = None
-
-# Server configuration
-SERVER_URL = "https://ai-tax-return-backend-92e5b1232028.herokuapp.com"
-UPLOAD_ENDPOINT = f"{SERVER_URL}/upload_documents"
 
 def upload_files_to_server(files: List) -> Optional[str]:
   try:
@@ -47,7 +51,7 @@ def upload_files_to_server(files: List) -> Optional[str]:
 
 def get_form_from_server(document_id: str) -> Optional[bytes]:
   try:
-    form_endpoint = f"{SERVER_URL}/documents/{document_id}"
+    form_endpoint = f"{GET_FORM_ENDPOINT}/{document_id}"
     response = requests.get(form_endpoint, timeout = 30)
     if response.status_code == 200:
       return response.content
