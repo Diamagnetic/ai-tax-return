@@ -50,7 +50,7 @@ class TaxCalculator:
     return TaxReturnSummary(
       forms_submitted = data.forms_submitted,
       total_income = total_income.quantize(Decimal("0.01")),
-      taxable_income = taxable_income
+      taxable_income = taxable_income,
       total_tax_withheld = tax_withheld.quantize(Decimal("0.01")),
       estimated_tax_due = estimated_tax_due,
       estimated_refund = estimated_refund,
