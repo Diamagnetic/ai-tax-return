@@ -36,15 +36,14 @@ class Form1040Generator:
     pii: UserPII,
     summary: TaxReturnSummary
   ) -> Form1040:
-    total_income = summary.total_income
-
     return Form1040(
       pii                   = pii,
       wages                 = data.w2.wages,
+      wages_total           = data.w2.wages,
       taxable_interest      = data.int_1099.interest_income,
       other_income          = data.nec_1099.nonemployee_compensation,
-      total_income          = total_income,
-      adjusted_gross_income = total_income,
+      total_income          = summary.total_income,
+      adjusted_gross_income = summary.total_income,
       standard_deduction    = self.tax_config.get_standard_deduction(),
       tax                   = summary.estimated_tax_due,
       federal_tax_withheld  = data.w2.federal_income_tax_withheld,

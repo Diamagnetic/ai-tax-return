@@ -14,6 +14,14 @@ class Form1040(BaseModel):
   pii: UserPII = Field(
     description = "Personally identifiable information of the taxpayer"
   )
+  wages: Decimal = Field(
+    alias = "1a",
+    description = "Wages, salaries, tips"
+  )
+  wages_total: Decimal = Field(
+    alias = "1z",
+    description = "Add lines 1a–1h"
+  )
   taxable_interest: Decimal = Field(
     alias = "2b",
     description = "Taxable interest from Form 1099-INT"
