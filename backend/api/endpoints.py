@@ -28,7 +28,7 @@ async def home():
 
 # Upload files, post user PII, extract data, calculate taxes, and
 # generate Form 1040 (do not send to user yet)
-@router.post("/submit_tax_form", response_class = JSONResponse)
+@router.post("/api/submit_tax_form", response_class = JSONResponse)
 async def upload_documents(
   background_tasks          : BackgroundTasks,
  
@@ -118,7 +118,7 @@ async def upload_documents(
   })
 
 # return form 1040 generated
-@router.get("/documents/{document_id}", response_class = FileResponse)
+@router.get("/api/documents/{document_id}", response_class = FileResponse)
 async def get_generated_form1040(
   background_tasks: BackgroundTasks,
   document_id: str
