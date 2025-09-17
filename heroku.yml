@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: chmod +x ./start.sh && ./start.sh
+  web: ./start.sh

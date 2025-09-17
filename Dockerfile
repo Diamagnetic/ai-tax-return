@@ -38,3 +38,4 @@ RUN apt update \
 RUN mkdir -p /etc/nginx/conf.d
 COPY ./nginx/vhost.conf /app/vhost.conf
 COPY ./start.sh .
+RUN chmod +x ./start.sh
