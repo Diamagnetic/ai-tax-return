@@ -33,7 +33,7 @@ RUN apt update \
     && apt install --no-install-recommends --no-install-suggests -y nginx \
     && rm -rf /var/lib/apt/lists/*
 RUN apt update \
-    && apt install --no-install-recommends --no-install-suggests -y envsubst\
+    && apt install --no-install-recommends --no-install-suggests -y gettext-base\
     && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /etc/nginx/conf.d
 COPY ./nginx/vhost.conf /app/vhost.conf
