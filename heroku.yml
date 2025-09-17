@@ -1,9 +1,5 @@
 build:
   docker:
-    web: nginx/Dockerfile
-    frontend: frontend/Dockerfile
-    backend: backend/Dockerfile
+    web: Dockerfile
 run:
-  frontend: streamlit run app.py --server.port=8051 --server.address=0.0.0.0 \
-            --client.toolbarMode=minimal --client.showErrorDetails=false
-  backend: uvicorn main:app  --host=0.0.0.0 --port=8000
+  web: ./start.sh
