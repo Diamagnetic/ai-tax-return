@@ -5,7 +5,7 @@ def api_middleware(app: FastAPI) -> None:
   app.add_middleware(
     CORSMiddleware,
     allow_origins = [
-        "http://localhost:8501"
+        "https://ai-tax-return-f117a8fd9825.herokuapp.com"
     ],
     allow_credentials = True,
     allow_methods=["GET", "POST"],
