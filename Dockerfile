@@ -36,6 +36,7 @@ RUN mkdir -p /etc/nginx/conf.d
 COPY ./nginx/vhost.conf /app/vhost.conf
 
 CMD sed "s/\${PORT}/$PORT/g" /app/vhost.conf > /etc/nginx/conf.d/default.conf \
+    && cat /etc/nginx/conf.d/default.conf \
     && streamlit run /app/frontend/app.py --server.address=0.0.0.0 \
     --client.toolbarMode=minimal --client.showErrorDetails=false \
     & uvicorn main:app --host=0.0.0.0 \
