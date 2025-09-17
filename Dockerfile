@@ -32,13 +32,10 @@ RUN pip install -r /app/backend/requirements.txt
 RUN apt update \
     && apt install --no-install-recommends --no-install-suggests -y nginx \
     && rm -rf /var/lib/apt/lists/*
-RUN apt update \
-    && apt install --no-install-recommends --no-install-suggests -y gettext-base\
-    && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /etc/nginx/conf.d
 COPY ./nginx/vhost.conf /app/vhost.conf
 
-CMD envsubst '$PORT' < /app/vhost.conf > /etc/nginx/conf.d/default.conf \
+CMD sed "s/\${PORT}/$PORT/g" /app/vhost.conf > /etc/nginx/conf.d/default.conf \
     && streamlit run /app/frontend/app.py --server.address=0.0.0.0 \
     --client.toolbarMode=minimal --client.showErrorDetails=false \
     & uvicorn main:app --host=0.0.0.0 \
