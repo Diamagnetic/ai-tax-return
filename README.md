@@ -98,10 +98,10 @@ The architecture is designed to cleanly separate the user interface, backend log
 **Components:**
 
 - **Frontend (Streamlit):**  
-  Allows users to upload tax PDFs (e.g., W-2, 1099-INT, 1099-NEC), displays summaries, and lets users preview and download the generated Form 1040. Sends uploaded files to the backend via REST API. The frontend is deployed on **Heroku** for public access.
+  Allows users to upload tax PDFs (e.g., W-2, 1099-INT, 1099-NEC), displays summaries, and lets users preview and download the generated Form 1040. Sends uploaded files to the backend via REST API. The frontend runs inside the same Heroku container, served through Nginx at the root path (/).
 
 - **Backend (FastAPI):**  
-  Handles PDF parsing, calls the OpenAI API to extract tax-relevant fields, aggregates the results, calculates tax liability using 2024 IRS brackets, and fills out a preformatted Form 1040. The backend is also deployed on **Heroku**, exposing RESTful endpoints.
+  Handles PDF parsing, calls the OpenAI API to extract tax-relevant fields, aggregates the results, calculates tax liability using 2024 IRS brackets, and fills out a preformatted Form 1040. TThe backend also runs in the same Heroku container, accessible via Nginx under the /api route.
 
   - **LLM Integration (OpenAI API):**  
   Interprets uploaded documents and extracts structured fields like income and tax withheld, enabling automation of tax form generation.
@@ -111,6 +111,15 @@ The architecture is designed to cleanly separate the user interface, backend log
 
   - **PDF Handling (PyMuPDF):**  
   Inserts values into a fillable version of Form 1040, and returns the completed PDF.
+
+  - **Deployment (Heroku + Nginx reverse proxy):**
+  Both frontend and backend run as background processes inside a single Heroku container. Heroku assigns one external $PORT, which is bound by Nginx. Nginx acts as a reverse proxy, routing:
+
+    - `/`: Streamlit frontend (port 8501)
+
+    - `/api`: FastAPI backend (port 8000)
+
+This ensures Heroku sees a single web service while internally supporting multiple processes.
 
 ## Dummy Documents
 
