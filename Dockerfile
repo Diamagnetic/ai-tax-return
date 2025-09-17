@@ -33,6 +33,7 @@ RUN apt update \
     && apt install --no-install-recommends --no-install-suggests -y nginx \
     && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /etc/nginx/conf.d
+RUN rm -f /etc/nginx/sites-enabled/default
 COPY ./nginx/vhost.conf /app/vhost.conf
 
 CMD sed "s/\${PORT}/$PORT/g" /app/vhost.conf > /etc/nginx/conf.d/default.conf \
